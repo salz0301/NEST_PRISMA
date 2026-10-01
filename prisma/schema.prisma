@@ -1,66 +1,59 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
-// datasource db {
-//   provider = "sqlite"
-// }
 datasource db {
   provider = "sqlite"
-  // url = env("DATABASE_URL")
 }
 
-model User{
-  id Int @id @default(autoincrement())
-  email String @unique
-  name String?
-  password String
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  password  String
   telephone String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  role Role @default(USER)
-  profile Profile?
-
-  tenantId Int
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-}
-model Profile{
-  id Int  @id @default(autoincrement())
-  userId Int @unique
-  user User @relation(fields: [userId], references: [id])
-  
-}
-model Tenant{
-  id Int  @id @default(autoincrement())
-  users User[] //lado 1
+  role      Role     @default(USER)
+  tenantId  Int
+  profile   Profile?
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
 }
 
-model Post{
-  id Int @id @default(autoincrement())
+model Profile {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Tenant {
+  id    Int    @id @default(autoincrement())
+  users User[]
+}
+
+model Post {
+  id         Int            @id @default(autoincrement())
+  name       String
   categories PostCategory[]
 }
-model Category{
-  id Int @id @default(autoincrement())
+
+model Category {
+  id    Int            @id @default(autoincrement())
+  name  String
   posts PostCategory[]
 }
-model PostCategory{
-  postID Int
+
+model PostCategory {
+  postID     Int
   categoryId Int
-  post Post @relation(fields: [postID], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+  post       Post     @relation(fields: [postID], references: [id])
 
-
-  @@id([postID,categoryId])
+  @@id([postID, categoryId])
 }
 
-enum Role{
+enum Role {
   USER
   ADMIN
 }
-
